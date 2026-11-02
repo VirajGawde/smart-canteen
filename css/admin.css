@@ -1,0 +1,36 @@
+/* ==========================================================
+   SMART CANTEEN — admin.css
+   Loaded after style.css + app.css on every admin/*.php page.
+   ========================================================== */
+
+.admin-stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 26px; }
+.admin-stat-grid .stat-card { padding: 16px 18px; }
+.admin-stat-grid .stat-value { font-size: 26px; }
+
+.filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.filter-chip { padding: 8px 16px; border-radius: var(--radius-pill); border: 1.5px solid var(--slate-200); background: var(--white); font-size: 13px; font-weight: 600; color: var(--ink-600); }
+.filter-chip.active { background: var(--navy-900); border-color: var(--navy-900); color: var(--white); }
+
+/* 84 benches is a long list — a find box sits above it. */
+.bench-list-head { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+.bench-list-head .card-sub { margin-bottom: 14px; }
+.bench-filter { flex: 0 1 320px; max-width: 100%; margin: 0 0 14px; }
+
+.bench-manage-row { display: flex; align-items: center; justify-content: space-between; padding: 16px; border: 1px solid var(--slate-200); border-radius: var(--radius-md); margin-bottom: 10px; gap: 16px; flex-wrap: wrap; }
+.bench-manage-row .info { display: flex; align-items: center; gap: 14px; }
+.bench-manage-row .seat-pills { display: flex; gap: 5px; }
+.seat-pill { width: 26px; height: 26px; border-radius: 7px; font-size: 10.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); }
+.bench-manage-row .actions { display: flex; gap: 8px; align-items: center; }
+
+.qr-display { text-align: center; padding: 20px; }
+.qr-display canvas { margin: 0 auto 14px; border: 1px solid var(--slate-200); border-radius: var(--radius-sm); padding: 12px; background: #fff; }
+
+.complaint-detail-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 22px; }
+.feedback-mini { padding: 10px 0; border-bottom: 1px solid var(--slate-100); font-size: 13.5px; }
+.feedback-mini:last-child { border-bottom: none; }
+
+.chart-card { background: var(--white); border: 1px solid var(--slate-200); border-radius: var(--radius-lg); padding: 22px; }
+.chart-card canvas { max-height: 260px; }
+
+@media (max-width: 1080px) { .admin-stat-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 900px) { .complaint-detail-grid { grid-template-columns: 1fr; } }

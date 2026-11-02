@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0F2A4A">
+<title>Offline · Smart Canteen</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+       background:#F5F8FC;color:#16202E;font-family:'Segoe UI',system-ui,sans-serif;text-align:center}
+  .card{max-width:360px;background:#fff;border-radius:20px;padding:32px 24px;box-shadow:0 8px 24px rgba(15,42,74,.10)}
+  img{width:72px;height:72px;border-radius:16px}
+  h1{font-size:1.25rem;color:#0F2A4A;margin:16px 0 8px}
+  p{color:#4B5768;line-height:1.5;margin:0 0 20px;font-size:.95rem}
+  button{background:#0F2A4A;color:#fff;border:0;border-radius:999px;padding:12px 28px;font-size:1rem;cursor:pointer}
+</style>
+</head>
+<body>
+  <div class="card">
+    <img src="images/icons/icon-192.png" alt="">
+    <h1>You're offline</h1>
+    <p>Smart Canteen shows live seat availability, so it needs an internet connection. Check your Wi-Fi or mobile data and try again.</p>
+    <button onclick="location.reload()">Try again</button>
+  </div>
+</body>
+</html>

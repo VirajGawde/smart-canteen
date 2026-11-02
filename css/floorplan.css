@@ -1,0 +1,338 @@
+/* ==========================================================
+   SMART CANTEEN — floorplan.css
+   The canteen floor plan: 84 benches in three areas, drawn from live
+   data by includes/floorplan.php.
+
+   Loaded by BOTH the public landing page (index.php — a static map)
+   and student/canteen.php (the clickable booking map), which is why it
+   is its own file instead of living in style.css (public) or app.css
+   (behind login).
+
+   Look: navy canvas, lavender walls, one box per bench. The box colour
+   is the bench's live state, using the app's status palette (green =
+   a seat is free, amber = reserved, red = occupied, grey = closed).
+   Brand red is NOT used for benches on purpose — red already means
+   "occupied" everywhere else in the app.
+
+   Built with flexbox + margins only (no CSS grid, no flex `gap`): the
+   plan has to hold its shape in older engines and screenshot tools too.
+   Horizontal sizes are percentages of the plan's width, so the plan
+   scales; vertical sizes are fixed, so the boxes stay slim like the
+   drawing. On narrow screens the map keeps its proportions and scrolls
+   sideways instead of squashing 84 benches into 360px.
+   ========================================================== */
+
+.fp {
+  --fp-bg: #0A1F38;               /* navy canvas (= --navy-950) */
+  --fp-line: #BCC4E8;             /* walls and outlines: lavender */
+  --fp-line-soft: #E9ECFB;        /* the opening in the aisle */
+  --fp-text: #E8ECFA;
+  --fp-muted: #9AA6C8;
+
+  /* A bench with at least one free seat. Green = the app's "available"
+     colour. To draw free benches in the brand red instead, set
+       --fp-free: var(--red-600);  --fp-free-ink: #fff;
+     (occupied is also red in this app, so keep the green unless you also
+     want to tell those two apart another way). */
+  --fp-free: var(--status-available, #18A971);
+  --fp-free-ink: var(--fp-bg);
+
+  --fp-box-h: 36px;               /* one bench */
+  --fp-top-gap: 14px;             /* air above / below the two front areas */
+  --fp-row-gap: 9px;              /* between two rows of benches */
+  --fp-side-w: 104px;             /* front right: vacant block + doorway column */
+  --fp-door-w: 102px;
+  --fp-door-h: 29px;
+  --fp-hall-pl: 20px;             /* hall padding (right one is where doorways exit) */
+  --fp-hall-pr: 28px;
+
+  background: var(--fp-bg);
+  color: var(--fp-text);
+  border-radius: 14px;
+  padding: 18px;
+  text-align: left;
+}
+.fp *, .fp *::before, .fp *::after { box-sizing: border-box; }
+
+/* ---------- Plan + legend ---------- */
+.fp-layout { display: flex; align-items: flex-start; }
+.fp-scroll { flex: 1 1 0%; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.fp-map { min-width: 600px; }
+
+.fp-title {
+  border: 2px solid var(--fp-line);
+  margin-bottom: 8px;
+  padding: 9px 12px;
+  text-align: center;
+  color: #fff;
+  font-family: var(--font-display, 'Segoe UI', sans-serif);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: .01em;
+}
+
+/* ---------- Top: Front Left | wall | Front Right ---------- */
+.fp-top {
+  display: flex;
+  border: 2px solid var(--fp-line);
+  border-bottom: 0;            /* the aisle below is this block's floor */
+}
+.fp-front-left { flex: 0 0 40%; padding: var(--fp-top-gap) 0; }
+.fp-divider { flex: 0 0 18px; background: var(--fp-line); }
+.fp-front-right { flex: 1 1 0%; min-width: 0; display: flex; padding: var(--fp-top-gap) 0; }
+.fp-fr-grid { flex: 1 1 0%; min-width: 0; margin-right: 14px; }
+
+/* Vacant block (top two rows) and the doorway (third row). The column is
+   pulled up over the area's padding so the block sits flush with the walls. */
+.fp-fr-side {
+  flex: 0 0 var(--fp-side-w);
+  display: flex;
+  flex-direction: column;
+  margin-top: calc(-1 * var(--fp-top-gap));
+}
+.fp-vacant {
+  height: calc(var(--fp-top-gap) + 2 * var(--fp-box-h) + var(--fp-row-gap));
+  background: rgba(188, 196, 232, .38);
+}
+.fp-fr-side .fp-door {
+  margin-top: calc(var(--fp-row-gap) + (var(--fp-box-h) - var(--fp-door-h)) / 2);
+}
+
+/* ---------- Aisle between the front areas and the hall ---------- */
+.fp-aisle { display: flex; height: 16px; }
+.fp-aisle > span { flex: 7.57 1 0%; background: var(--fp-line); }
+.fp-aisle > .fp-aisle-open { flex: 1.68 1 0%; background: var(--fp-line-soft); }
+.fp-aisle > span:last-child { flex: 1.65 1 0%; }
+
+/* ---------- Main hall (thick walls left and bottom) ---------- */
+.fp-hall {
+  border: 2px solid var(--fp-line);
+  border-top: 0;
+  border-left-width: 10px;
+  border-bottom-width: 16px;
+  padding: 16px var(--fp-hall-pr) 0 var(--fp-hall-pl);
+}
+/* The breaks between bench blocks, each with a doorway in the right wall.
+   The negative margin carries the arrow out to the wall it passes through. */
+.fp-gap {
+  height: 56px;
+  margin-right: calc(-1 * var(--fp-hall-pr));
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.fp-gap-end { height: 52px; }
+
+/* ---------- Doorways: hollow arrow pointing into the hall ---------- */
+.fp-door {
+  position: relative;
+  flex: 0 0 auto;
+  width: var(--fp-door-w);
+  height: var(--fp-door-h);
+  margin-left: auto;
+  color: var(--fp-line);
+}
+.fp-door svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+/* Opens the wall where the arrow's shaft passes through it. */
+.fp-door::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: 36%;
+  height: 28%;
+  width: 6px;
+  background: var(--fp-bg);
+}
+
+/* ---------- Rows of benches ---------- */
+.fp-row { display: flex; align-items: stretch; }
+.fp-row + .fp-row { margin-top: var(--fp-row-gap); }
+
+/* Front Left: 4 equal boxes */
+.fp-row-4 { padding-right: 3%; }
+.fp-row-4 > .fp-bench { margin-left: 6%; }
+
+/* Front Right: 3 boxes, slightly different widths like the drawing */
+.fp-row-3 > .fp-bench { margin-left: 4.8%; }
+.fp-row-3 > .fp-bench:nth-child(1) { flex-grow: 1.35; }
+.fp-row-3 > .fp-bench:nth-child(3) { flex-grow: .97; }
+
+/* Main hall: three pairs of wide boxes, then one narrow column */
+.fp-row-7 > .fp-bench:nth-child(2),
+.fp-row-7 > .fp-bench:nth-child(4),
+.fp-row-7 > .fp-bench:nth-child(6) { margin-left: 2.2%; }
+.fp-row-7 > .fp-bench:nth-child(3),
+.fp-row-7 > .fp-bench:nth-child(5),
+.fp-row-7 > .fp-bench:nth-child(7) { margin-left: 4.4%; }
+.fp-row-7 > .fp-bench:nth-child(7) { flex-grow: .62; }
+
+/* ---------- One bench ----------
+   Deliberately NOT a flex container, and no `gap`: the same rules style a
+   <button> (booking page) and a <div> (landing page), and buttons are the
+   least predictable flex containers across browsers. A <button> also
+   centres its content vertically whatever the padding says, so the number
+   and the seat bars are both pinned with position:absolute — the box then
+   looks identical whether it is a button or a div. */
+.fp-bench {
+  display: block;
+  flex: 1 1 0%;
+  min-width: 0;
+  height: var(--fp-box-h);
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border: 1.5px solid var(--fp-line);
+  border-radius: 3px;
+  background-color: transparent;
+  color: var(--fp-bg);
+  font-family: var(--font-mono, 'Courier New', monospace);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 14px;
+  text-align: center;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.fp-num { position: absolute; top: 4px; left: 0; right: 0; display: block; line-height: 14px; }
+
+/* Four bars along the bottom = the bench's four seats, in seat order. */
+.fp-seats {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  bottom: 3px;
+  height: 7px;
+  display: flex;
+  padding: 1px;
+  border-radius: 2px;
+  background: var(--fp-bg);
+}
+.fp-seats > i { display: block; flex: 1 1 0%; margin-left: 2px; border-radius: 1px; }
+.fp-seats > i:first-child { margin-left: 0; }
+.fp-s-available   { background: var(--fp-free); }
+.fp-s-reserved    { background: var(--status-reserved, #E8A33D); }
+.fp-s-occupied    { background: var(--status-occupied, #E5484D); }
+.fp-s-unavailable { background: var(--status-unavailable, #8791A1); }
+
+/* The bench's colour = its state (see floorplanBenchState() in PHP). */
+.fp-available   { background-color: var(--fp-free); color: var(--fp-free-ink); }
+.fp-reserved    { background-color: var(--status-reserved, #E8A33D);  color: var(--fp-bg); }
+.fp-occupied    { background-color: var(--status-occupied, #E5484D);  color: #fff; text-shadow: 0 1px 0 rgba(0, 0, 0, .28); }
+/* Closed: grey AND hatched, so it never depends on colour alone. */
+.fp-unavailable {
+  background-color: var(--status-unavailable, #8791A1);
+  background-image: repeating-linear-gradient(135deg, transparent, transparent 5px, rgba(10, 31, 56, .18) 5px, rgba(10, 31, 56, .18) 7px);
+  color: var(--fp-bg);
+}
+/* A slot with no bench in the database: keep the space, draw nothing. */
+.fp-empty { visibility: hidden; }
+
+/* ---------- Clickable map (student/canteen.php) ---------- */
+.fp-live .fp-bench { cursor: default; transition: transform .12s ease, box-shadow .12s ease; }
+.fp-live button.fp-bench { cursor: pointer; }
+.fp-live button.fp-bench:disabled { cursor: not-allowed; }
+.fp-live button.fp-bench:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 2px #fff, 0 8px 16px rgba(0, 0, 0, .45);
+  z-index: 2;
+}
+.fp-live .fp-bench:focus-visible { outline: 3px solid #fff; outline-offset: 2px; z-index: 2; }
+/* Banned, or already holding a seat: the map is look-only. */
+.fp-live.fp-locked .fp-bench { opacity: .72; }
+
+/* ---------- Legend ---------- */
+.fp-legend {
+  flex: 0 0 150px;
+  width: 150px;
+  margin: 0 0 0 20px;
+  padding: 2px 0 0;
+  list-style: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fp-text);
+}
+.fp-legend li { display: flex; align-items: center; margin: 0 0 12px; }
+.fp-swatch {
+  position: relative;
+  display: block;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 18px;
+  margin-right: 10px;
+  border: 1.5px solid var(--fp-line);
+  border-radius: 3px;
+}
+.fp-legend .fp-legend-note {
+  display: block;
+  margin: 18px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid rgba(188, 196, 232, .25);
+  font-size: 11.5px;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--fp-muted);
+}
+.fp-swatch-bench {
+  flex: none;
+  width: 52px;
+  height: 22px;
+  margin: 0 0 8px;
+  background-color: var(--fp-free);
+}
+
+/* Benches numbered beyond the plan (an admin added Bench 85+): never hidden. */
+.fp-extra { margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(188, 196, 232, .35); }
+.fp-extra-title { margin-bottom: 10px; color: var(--fp-muted); font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.fp-row-extra { flex-wrap: wrap; }
+.fp-row-extra > .fp-bench { flex: 0 0 64px; margin: 0 8px 8px 0; }
+
+.fp-hint { display: none; margin-top: 10px; color: var(--fp-muted); font-size: 12px; text-align: center; }
+
+/* ---------- Static map (landing page): smaller, unlabelled ---------- */
+.fp-static {
+  --fp-box-h: 24px;
+  --fp-top-gap: 9px;
+  --fp-row-gap: 6px;
+  --fp-side-w: 72px;
+  --fp-door-w: 64px;
+  --fp-door-h: 18px;
+  --fp-hall-pl: 14px;
+  --fp-hall-pr: 18px;
+  padding: 14px;
+  box-shadow: var(--shadow-lg, 0 20px 48px rgba(15, 42, 74, .16));
+}
+.fp-static .fp-scroll { overflow: visible; }
+.fp-static .fp-map { min-width: 0; }
+.fp-static .fp-title { margin-bottom: 6px; padding: 6px 10px; border-width: 1.5px; font-size: 15px; }
+.fp-static .fp-top { border-width: 1.5px; border-bottom: 0; }
+.fp-static .fp-divider { flex-basis: 12px; }
+.fp-static .fp-fr-grid { margin-right: 8px; }
+.fp-static .fp-aisle { height: 11px; }
+.fp-static .fp-hall { border-width: 1.5px; border-top: 0; border-left-width: 7px; border-bottom-width: 11px; padding-top: 11px; }
+.fp-static .fp-gap { height: 38px; }
+.fp-static .fp-gap-end { height: 34px; }
+.fp-static .fp-bench { padding: 0; border-width: 1px; border-radius: 2px; }
+.fp-static .fp-num, .fp-static .fp-seats { display: none; }
+.fp-static .fp-door svg { stroke-width: 3; }
+.fp-static .fp-door::after { right: -1.5px; width: 5px; }
+
+/* ---------- Narrow screens ---------- */
+@media (max-width: 760px) {
+  .fp { padding: 14px; }
+  .fp-layout { display: flex; flex-direction: column; }
+  .fp-scroll { flex: none; width: 100%; }
+  .fp-legend { order: -1; flex: none; width: auto; margin: 0 0 14px; display: flex; flex-wrap: wrap; }
+  .fp-legend li { margin: 0 18px 8px 0; }
+  .fp-legend .fp-legend-note { width: 100%; margin: 2px 0 0; padding-top: 10px; }
+  .fp-hint { display: block; }
+}
